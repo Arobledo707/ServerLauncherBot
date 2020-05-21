@@ -72,45 +72,6 @@ def parse_json_config():
         print_and_log(message_type.INFO, 'Creating a new JSON file')
         create_json_config_file()
 
-#-----------------------------------------------------parse_xml_config------------------------------------------------------------
-def parse_xml_config():
-    """Trys to parse xml file into tree. If it fails it creates a default xml file.
-Parses the data and assigns prefixes, channelsToLog, Token"""
-    try:
-        tree = ET.parse(ConfigXmlFile)
-    except Exception as e:
-        print_and_log(LogTypeError, e)
-        print_and_log(LogTypeInfo, 'Creating new xml file')
-        #create_xml_config_file()
-    tree = ET.parse(ConfigXmlFile)
-    root = tree.getroot()
-    for Element in root:
-        if Element.tag == XMLChannel:
-            info = Element.get(XMLChannelAttribute)
-            print_and_log(LogTypeInfo, 'Adding ' + info + ' to logged channels')
-            if info in parsedChannelInfo:
-                print_and_log(LogTypeInfo, info + ' was already in channels to log')
-            else:
-                parsedChannelInfo.append(info)
-        if Element.tag == XMLToken:
-            global TOKEN
-            TOKEN = Element.get(XMLTokenAttribute)
-            print_and_log(LogTypeInfo, 'Using this Token: ' + TOKEN)
-        if Element.tag == XMLPrefix:
-            prefix = Element.get(XMLPrefixAttribute)
-            print_and_log(LogTypeInfo, 'Adding ' + prefix + ' to bot prefixes')
-            if prefix in BotPrefix:
-                 print_and_log(LogTypeInfo, prefix + ' is already a prefix!')
-            else:
-                BotPrefix.append(Element.get(XMLPrefixAttribute))
-        if Element.tag == XMLRole:
-            role = Element.get(XMLRoleAttribute)
-            print_and_log(LogTypeInfo, 'Adding ' + role + ' to command roles')
-            if role in command_roles:
-                print_and_log(LogTypeInfo, role + ' was already in command roles!')
-            else:
-                command_roles.append(role)
-
 
 #-----------------------------------------------------------RemoveFromXML-----------------------------------------------------------
 def RemoveFromXML(Element, attribName, attribValue):
