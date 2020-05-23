@@ -59,7 +59,7 @@ def parse_json_config():
                     command_roles.append(role)
                     print_and_log(message_type.INFO, 'Adding' + role + 'to command roles')
                 else:
-                    print_and_log(message_type.INFO, role + 'was already in command roles!')
+                    print_and_log(message_type.INFO, role + ' was already in command roles!')
             for prefix in data['prefixes']:
                 if prefix not in data['prefixes']:
                     global command_prefix
@@ -87,20 +87,24 @@ def RemoveFromXML(Element, attribName, attribValue):
     file.close()
 
 
-#------------------------------------------------------------add_role_to_json----------------------------------------------------------
-def add_role_to_json(role):
+
+#------------------------------------------------------------add_to_json-------------------------------------------------------
+def add_prefix_to_json(type, to_add):
     with open(config_file, "a") as file:
         data = json.load(file)
-        data['roles'].append(role)
+        data[type].append(to_add)
         json_data = json.dumps(data, indent = len(data))
         file.write(json_data)
-#------------------------------------------------------------add_prefix_to_json-------------------------------------------------------
-def add_prefix_to_json(prefix):
-    with open(config_file, "a") as file:
+
+
+#-------------------------------------------------------------remove_from_json-------------------------------------------------------
+def remove_from_json(type, to_remove):
+    with open(config_file, "w") as file:
         data = json.load(file)
-        data['roles'].append(prefix)
+        data[type].remove(to_remove)
         json_data = json.dumps(data, indent = len(data))
         file.write(json_data)
+
 
 #----------------------------------------------check_if_roles_assigned----------------------------------------------------------------
 def check_if_roles_assigned():
