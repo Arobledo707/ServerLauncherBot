@@ -43,7 +43,6 @@ def check_config_file():
     if not os.path.exists(config_file):
         create_json_config_file()
     parse_json_config()
-    #parse_xml_config()
 
 
 #-----------------------------------------------------parse_json_config
@@ -148,6 +147,58 @@ async def prefixes(context):
         await context.send(format_message(message_type.LOG, prefix))
     await context.send(format_message(message_type.LOG, 'Done!'))
 
+#------------------------------------------------------add_role----------------------------------------------------------------------
+@client.command(name='AddRole',
+                description='Adds a server role that the bot will take commands from.',
+                brief='Add a role that the bot will listen to.',
+                aliases=['addrole'],
+                pass_context=True)
+async def add_role(context, role=None):
+    """Adds a role to the list of roles the bot will listen to. Adds a new xml element for the role."""
+    if role is None:
+        await context.send(format_message(message_type.WARNING, 'Role not entered'))
+        return
+    async with context.typing():
+        role = role.replace("'", '')
+        server = client.get_guild(server_id)
+        added_role = None
+        for serv_role in server.roles:
+            if role.lower() == serv_role.name.lower():
+                added_role = serv_role.name
+                break
+        else:
+            await context.send(format_message(message_type.WARNING, 'Server does not have this role'))
+            return
+        command_roles.append(added_role)
+        add_to_json('role', added_role)
+        await context.send(format_message(message_type.LOG, added_role + ' has been added'))
+
+#----------------------------------------------------------remove_role---------------------------------------------------------------
+@client.command(name='RemoveRole',
+                description='Removes a server role that the bot takes commands from.',
+                brief='Remove a role that the bot listens to',
+                aliases=['removerole'],
+                pass_context=True)
+async def remove_role(context, role=None):
+    """Removes specified role from list of roles the bot listens to and removes it from the xml config file."""
+    if role == None:
+        await context.send(format_message(message_type.WARNING, 'Role not entered'))
+    role = role.replace("'", '')
+    remove_role = None
+    for serv_role in command_roles:
+        if serv_role.lower() == role:
+            remove_role = serv_role
+            break
+    else:
+        await context.send(format_message(message_type.WARNING, 'Role was not in Command Roles'))
+        return
+    if len(command_roles) == 1:
+        await context.send(format_message(message_type.WARNING, 'Only one Role can give the bot commands. Add another role to be able to remove this one.'))
+        return
+    command_roles.remove(serv_role)
+    #LogCommand(context.message)
+    remove_from_json('role', serv_role)
+    await context.send(format_message(message_type.LOG, serv_role + ' has been removed'))
 
 #-----------------------------------------------start_terraria_server-----------------------------------------------------------------
 @client.command(name='startterrariaserver',
