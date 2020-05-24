@@ -56,14 +56,14 @@ def parse_json_config():
                 global command_roles
                 if role not in command_roles:
                     command_roles.append(role)
-                    print_and_log(message_type.INFO, 'Adding' + role + 'to command roles')
+                    print_and_log(message_type.INFO, 'Adding ' + role + 'to command roles')
                 else:
                     print_and_log(message_type.INFO, role + ' was already in command roles!')
             for prefix in data['prefixes']:
                 global command_prefix
                 if prefix not in command_prefix:
                     command_prefix.append(prefix)
-                    print_and_log(message_type.INFO, 'Adding' + prefix + 'to bot prefixes')
+                    print_and_log(message_type.INFO, 'Adding ' + prefix + 'to bot prefixes')
                 else:
                     print_and_log(message_type.INFO, prefix + ' is already a prefix!')
     except Exception as e:
