@@ -25,6 +25,7 @@ client.case_insensitive = True
 
 console_log = 'console.txt'
 config_file = 'config.json'
+terraria_script_path = None
 
 class message_type(Enum):
     LOG = 0
@@ -53,6 +54,8 @@ def parse_json_config():
             data = json.load(file)
             global token
             token = data['token']
+            global terraria_script_path
+            terraria_script_path = data['terrariascript']
             for role in data['roles']:
                 global command_roles
                 if role not in command_roles:
@@ -121,8 +124,12 @@ def create_json_config_file():
         global token
         if token is None:
             token = "Enter Token Here"
+        global terraria_script_path;
+        if terraria_script_path is None:
+            terraria_script_path = "Enter script path here"
         file.write('''{
 "token": "''' + token + '''",
+"terrariascript": "''' + terraria_script_path + '''",
 "prefixes": ["$"],
 "roles": ["Admin"]
 }''')
@@ -208,8 +215,10 @@ async def remove_role(context, role=None):
                 aliases=['sts', 'terraria'],
                 pass_context=True)
 async def start_terraria_server(context):
+    if terraria_script_path is None or terraria_script_path is 'Enter script path here':
+        await context.send(format_message(message_type.ERROR, 'Script path not entered!'))
     await context.send(format_message(message_type.LOG, 'Starting Terraria Server!'))
-    subprocess.call('startserver.sh', shell=True)
+    subprocess.call(terraria_script_path, shell=True)
 
 
 #-----------------------------------------------------get_version----------------------------------------------------------------------
