@@ -8,6 +8,7 @@ import logging
 from enum import Enum
 import time
 import os
+import random
 
 
 logging.basicConfig(filename='./console.txt', filemode='a+', level=logging.INFO, format='%(asctime)s:%(levelname)s:%(message)s')
@@ -56,14 +57,14 @@ def parse_json_config():
                 global command_roles
                 if role not in command_roles:
                     command_roles.append(role)
-                    print_and_log(message_type.INFO, 'Adding ' + role + 'to command roles')
+                    print_and_log(message_type.INFO, 'Adding ' + role + ' to command roles')
                 else:
                     print_and_log(message_type.INFO, role + ' was already in command roles!')
             for prefix in data['prefixes']:
                 global command_prefix
                 if prefix not in command_prefix:
                     command_prefix.append(prefix)
-                    print_and_log(message_type.INFO, 'Adding ' + prefix + 'to bot prefixes')
+                    print_and_log(message_type.INFO, 'Adding ' + prefix + ' to bot prefixes')
                 else:
                     print_and_log(message_type.INFO, prefix + ' is already a prefix!')
     except Exception as e:
@@ -208,7 +209,7 @@ async def remove_role(context, role=None):
                 pass_context=True)
 async def start_terraria_server(context):
     await context.send(format_message(message_type.LOG, 'Starting Terraria Server!'))
-    subprocess.call('startserver.sh')
+    subprocess.call('startserver.sh', shell=True)
 
 
 #-----------------------------------------------------get_version----------------------------------------------------------------------
@@ -220,8 +221,24 @@ async def start_terraria_server(context):
 async def get_version(context):
     """sends user bot's version number"""
     async with context.typing():
+        
         await context.send(format_message(message_type.LOG,'Version: ' + version))
 
+
+#------------------------------------------------coin_flip--------------------------------------------------------------------------
+@client.command(name='CoinFlip',
+                description='random 0-1 then prints heads or tails',
+                brief='coin flip',
+                aliases=['cf', 'Coin', 'coinflip'],
+                pass_context=True)
+async def coin_flip(context):
+    """random 0-1 and sends results"""
+    async with context.typing():
+        result = random.randint(0,1)
+        coin_result = 'Heads'
+        if result is 0:
+            coin_result = 'Tails'
+        await context.send(format_message(message_type.LOG, coin_result))
 
 #------------------------------------------------------format_message---------------------------------------------------------------
 def format_message(message_type, message):
