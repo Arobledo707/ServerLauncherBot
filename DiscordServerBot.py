@@ -310,7 +310,7 @@ def print_and_log(message_type, string):
 
 #-------------------------------------------------------on_ready------------------------------------------------------------------
 @client.event
-async def on_ready(message):
+async def on_ready():
     """This is called when the bot comes is ready"""
     if len(client.guilds) > 1:
         print_and_log(LogTypeWarning,'Connected to more than one server!')
