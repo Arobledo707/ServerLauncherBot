@@ -9,11 +9,12 @@ from enum import Enum
 import time
 import os
 import random
+import urllib.request
 
 
 logging.basicConfig(filename='./console.txt', filemode='a+', level=logging.INFO, format='%(asctime)s:%(levelname)s:%(message)s')
 
-version = '0.1'
+version = '0.2'
 
 token = None
 server_id = None
@@ -27,6 +28,7 @@ console_log = 'console.txt'
 config_file = 'config.json'
 terraria_script_path = None
 terraria_exit_path = None
+ip = urllib.request.urlopen('https://api.ipify.org').read().decode('utf8')
 
 class message_type(Enum):
     LOG = 0
@@ -218,11 +220,19 @@ async def remove_role(context, role=None):
     remove_from_json('role', serv_role)
     await context.send(format_message(message_type.LOG, serv_role + ' has been removed'))
 
+#---------------------------------------------------get_ip-----------------------------------------------------------------------------
+@client.command(name='ip',
+                description="Get's ip",
+                brief='pubic ip',
+                pass_context=true)
+async def get_ip(context):
+    await context.send(format_message(message_type.LOG, ip))
+
 #-----------------------------------------------start_terraria_server-----------------------------------------------------------------
 @client.command(name='StartTerrariaServer',
                 description='Starts terraria server if it is not running',
                 brief='Starts terraria server',
-                aliases=['sts', 'terraria'],
+                aliases=['st', 'terraria'],
                 pass_context=True)
 async def start_terraria_server(context):
     if terraria_script_path is None or terraria_script_path is 'Enter script path here':
@@ -234,7 +244,7 @@ async def start_terraria_server(context):
 @client.command(name='ExitTerrariaServer',
                 description='Exits terraria server ',
                 brief='exits terraria server',
-                aliases=['exitterraria', 'ExitTerraria', 'QuitTerraria', 'quitterraria'],
+                aliases=['exitterraria', 'ExitTerraria', 'QuitTerraria', 'quitterraria', 'et'],
                 pass_context=True)
 async def exit_terraria_server(context):
     if terraria_exit_path is None or terraria_exit_path is 'Enter script path here':
@@ -253,7 +263,6 @@ async def exit_terraria_server(context):
 async def get_version(context):
     """sends user bot's version number"""
     async with context.typing():
-        
         await context.send(format_message(message_type.LOG,'Version: ' + version))
 
 
@@ -301,7 +310,7 @@ def print_and_log(message_type, string):
 
 #-------------------------------------------------------on_ready------------------------------------------------------------------
 @client.event
-async def on_ready():
+async def on_ready(message):
     """This is called when the bot comes is ready"""
     if len(client.guilds) > 1:
         print_and_log(LogTypeWarning,'Connected to more than one server!')
@@ -313,7 +322,10 @@ async def on_ready():
     commands = client.commands
     print_and_log(message_type.INFO, 'Running version: ' + version)
 
-
+@client.event
+async def on_message():
+    if message.author.bot == True:
+        return
 #-------------------------------------------------run_client-----------------------------------------------------------------------
 def run_client(client):
     """Try to run the bot and if it fails wait a minute and try again"""
