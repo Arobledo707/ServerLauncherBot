@@ -325,7 +325,7 @@ async def on_ready(message):
 
 #-------------------------------------------------------on_message------------------------------------------------------------------
 @client.event
-async def on_message():
+async def on_message(message):
     if message.author.bot == True:
         return
     for prefix in command_prefix:
