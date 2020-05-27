@@ -83,7 +83,8 @@ def parse_json_config():
 
 
 #------------------------------------------------------------add_to_json-------------------------------------------------------
-def add_prefix_to_json(type, to_add):
+
+def add_to_json(type, to_add):
     with open(config_file, "a") as file:
         data = json.load(file)
         data[type].append(to_add)
@@ -98,6 +99,7 @@ def remove_from_json(type, to_remove):
         data[type].remove(to_remove)
         json_data = json.dumps(data, indent = len(data))
         file.write(json_data)
+
 
 
 #----------------------------------------------check_if_roles_assigned----------------------------------------------------------------
