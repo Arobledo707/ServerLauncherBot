@@ -322,10 +322,36 @@ async def on_ready(message):
     commands = client.commands
     print_and_log(message_type.INFO, 'Running version: ' + version)
 
+
+#-------------------------------------------------------on_message------------------------------------------------------------------
 @client.event
 async def on_message():
     if message.author.bot == True:
         return
+    for prefix in command_prefix:
+        if message.content[0].lower() == prefix:
+            break
+    else:
+        return
+    global server_id
+    this_server = client.get_guild(server_id)
+    server_member = this_server.get_member(message.author.id)
+    if server_member is None:
+        return
+    else:
+        roles = server_member.roles
+        bot_listens = False
+        for role in command_roles:
+            for r in roles:
+                if role == r.name:
+                    bot_listens = True
+                    break
+    if bot_listens:
+        message.content = message.content.lower()
+        message.author = server_member
+        await client.process_commands(message)
+        
+    
 #-------------------------------------------------run_client-----------------------------------------------------------------------
 def run_client(client):
     """Try to run the bot and if it fails wait a minute and try again"""
