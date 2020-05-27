@@ -26,6 +26,7 @@ client.case_insensitive = True
 console_log = 'console.txt'
 config_file = 'config.json'
 terraria_script_path = None
+terraria_exit_path = None
 
 class message_type(Enum):
     LOG = 0
@@ -55,7 +56,9 @@ def parse_json_config():
             global token
             token = data['token']
             global terraria_script_path
-            terraria_script_path = data['terrariascript']
+            terraria_script_path = data['terrariastart']
+            global terraria_exit_path
+            terraria_exit_path = data['terrariaexit']
             for role in data['roles']:
                 global command_roles
                 if role not in command_roles:
@@ -74,20 +77,6 @@ def parse_json_config():
         print_and_log(message_type.ERROR, e)
         print_and_log(message_type.INFO, 'Creating a new JSON file')
         create_json_config_file()
-
-
-#-----------------------------------------------------------RemoveFromXML-----------------------------------------------------------
-def RemoveFromXML(Element, attribName, attribValue):
-    """Removes element with an attrivute of certain value from XML file"""
-    tree = ET.parse(ConfigXmlFile)
-    root = tree.getroot()
-    for element in root.findall(Element):
-        if attribValue == element.get(attribName):
-            root.remove(element)
-    xmlstr = xml.dom.minidom.parseString(ET.tostring(root)).toxml()
-    file = open(ConfigXmlFile, 'w')
-    file.write(xmlstr)
-    file.close()
 
 
 
@@ -116,6 +105,23 @@ def check_if_roles_assigned():
         print_and_log(message_type.ERROR, 'No roles assigned. Either generate a new file or add\n"roles": ["FakeRole"] in config.json')
 
 
+#--------------------------------------------------roles----------------------------------------------------------------------------
+@client.command(name='Roles',
+                description='Sends client the list of roles that the bot will take commands from.',
+                brief='Sends client roles bot listens to',
+                aliases=['roles'],
+                pass_context=True)
+async def roles(context):
+    """Sends client each role in commandRoles"""
+    if len(command_roles) == 0:
+        await context.send(format_message(message_type.ERROR, 'Error: No roles have been added. Use AddRole to add a role.'))
+        return
+    async with context.typing():
+        await context.send(format_message(message_type.LOG, 'These are the roles that the bot will take commands from:'))
+        for role in command_roles:
+            await context.send(format_message(message_type.LOG, role))
+        await context.send(format_message(message_type.LOG, 'Done listing roles.'))
+
 #--------------------------------------------------------create_json_config_file------------------------------------------------------
 # Creates initial json config file for the bot
 def create_json_config_file():
@@ -127,9 +133,13 @@ def create_json_config_file():
         global terraria_script_path;
         if terraria_script_path is None:
             terraria_script_path = "Enter script path here"
+        global terraria_exit_path;
+        if terraria_exit_path is None:
+            terraria_exit_path = "Enter script path here"
         file.write('''{
 "token": "''' + token + '''",
-"terrariascript": "''' + terraria_script_path + '''",
+"terrariastart": "''' + terraria_script_path + '''",
+"terrariaexit": "''' + terraria_script_path + '''",
 "prefixes": ["$"],
 "roles": ["Admin"]
 }''')
@@ -209,7 +219,7 @@ async def remove_role(context, role=None):
     await context.send(format_message(message_type.LOG, serv_role + ' has been removed'))
 
 #-----------------------------------------------start_terraria_server-----------------------------------------------------------------
-@client.command(name='startterrariaserver',
+@client.command(name='StartTerrariaServer',
                 description='Starts terraria server if it is not running',
                 brief='Starts terraria server',
                 aliases=['sts', 'terraria'],
@@ -219,6 +229,19 @@ async def start_terraria_server(context):
         await context.send(format_message(message_type.ERROR, 'Script path not entered!'))
     await context.send(format_message(message_type.LOG, 'Starting Terraria Server!'))
     subprocess.call(terraria_script_path, shell=True)
+
+#-----------------------------------------------exit_terraria_server-----------------------------------------------------------------
+@client.command(name='ExitTerrariaServer',
+                description='Exits terraria server ',
+                brief='exits terraria server',
+                aliases=['exitterraria', 'ExitTerraria', 'QuitTerraria', 'quitterraria'],
+                pass_context=True)
+async def exit_terraria_server(context):
+    if terraria_exit_path is None or terraria_exit_path is 'Enter script path here':
+        await context.send(format_message(message_type.ERROR, 'Script path not entered!'))
+    await context.send(format_message(message_type.LOG, 'Exiting Terraria Server!'))
+    subprocess.call(terraria_exit_path, shell=True)
+
 
 
 #-----------------------------------------------------get_version----------------------------------------------------------------------
