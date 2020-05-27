@@ -224,7 +224,7 @@ async def remove_role(context, role=None):
 @client.command(name='ip',
                 description="Get's ip",
                 brief='pubic ip',
-                pass_context=true)
+                pass_context=True)
 async def get_ip(context):
     await context.send(format_message(message_type.LOG, ip))
 
