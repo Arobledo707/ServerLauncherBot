@@ -4,6 +4,7 @@ Python 3
 Modules: discord  
 Terraria server(I use the TShock repository for my server)  
 Admin privledges on a discord server  
+screen #sudo apt install screen if it isn't installed already
 This was only tested on a Raspberrypi running Raspbian  
 
 This is a Discord bot that is used to launch a terraria server that is running on the same server that the bot is on.
